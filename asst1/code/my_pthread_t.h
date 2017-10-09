@@ -29,8 +29,8 @@ typedef struct thread_node {
 } thread_node;
 
 typedef struct threadControlBlock {
-	thread_node* running_queue;
-	thread_node* waiting_queue;
+	queue* running_queue[3] = {NULL, NULL, NULL};
+	queue* waiting_queue;
 	my_pthread_t current_thread;
 } tcb; 
 
@@ -50,6 +50,10 @@ typedef struct my_pthread_mutex_t {
 typedef struct lock {
 	int value;
 } lock;
+
+typedef struct queue{
+  struct node* head;
+} queue;
 
 /* define your data structures here: */
 

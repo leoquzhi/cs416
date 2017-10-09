@@ -8,6 +8,25 @@
 
 #include "my_pthread_t.h"
 
+struct thread_node currentNode;
+struct queue *waitingQueue;
+struct queue *runningQueue[3] = {NULL, NULL, NULL};
+
+void init()
+{
+
+	currentNode = (struct thread_node *)malloc(sizeof(struct thread_node));
+	waitingQueue = (struct queue *)malloc(sizeof(struct queue));
+ 	for (i = 0; i < 3; i++)
+    {
+      runningQueue[i] = (struct queue *)malloc(sizeof(struct queue));
+      runningQueue[i]->head = NULL;
+    }
+
+
+}
+
+
 /* create a new thread */
 int my_pthread_create(my_pthread_t * thread, pthread_attr_t * attr, void *(*function)(void*), void * arg) {
 	
