@@ -18,45 +18,54 @@
 #include <stdlib.h>
 #include <ucontext.h>
 #include <sys/time.h>
-
-tcb* scheduler = malloc(sizeof(tcb));
+#include <signal.h>
 
 typedef uint my_pthread_t;
-
-typedef struct thread_node {
-	my_pthread thread;
-	struct thread_node* next;
-} thread_node;
-
-typedef struct threadControlBlock {
-	queue* running_queue[3] = {NULL, NULL, NULL};
-	queue* waiting_queue;
-	my_pthread_t current_thread;
-} tcb; 
 
 typedef struct my_pthread {
 	ucontext_t context;
 	int priority;
-	int priority_level;
+	int execution_time;
 	uint pid;
+	int finished;
 } my_pthread;
+
+typedef struct thread_node {
+	my_pthread* thread;
+	struct thread_node* next;
+} thread_node;
+
+typedef struct waiting_queue_node {
+	my_pthread* thread;
+	uint mutex_lock;
+	struct waiting_queue_node* next;
+} waiting_queue_node;
+
+typedef struct threadControlBlock {
+//	The first run queue is round robin with a time quantum of 25 ms
+	thread_node* first_running_queue;
+//	The second run queue is round robin with a time quantum of 50 ms
+	thread_node* second_running_queue;
+//	The third run queue is FIFO
+	thread_node* third_running_queue;
+//	Stores which queue is currently running
+	int current_queue_number;
+	waiting_queue_node* waiting_queue;
+} tcb; 
 
 /* mutex struct definition */
 typedef struct my_pthread_mutex_t {
 	uint pid;
-	lock* mutex_lock;
+	int mutex_lock;
+	uint mid;
 } my_pthread_mutex_t;
 
-typedef struct lock {
-	int value;
-} lock;
-
-typedef struct queue{
-  struct node* head;
-} queue;
-
 /* define your data structures here: */
-
+tcb* scheduler;
+struct itimerval* timer;
+int scheduler_running = 0;
+int execution_time = 0;
+uint mutex_id = 0;
 // Feel free to add your own auxiliary data structures
 
 
